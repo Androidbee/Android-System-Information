@@ -38,6 +38,8 @@ import android.app.ActivityManager.MemoryInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Environment;
+import android.os.StatFs;
 import android.provider.Settings.Secure;
 import android.util.Log;
 
@@ -308,6 +310,49 @@ public class SysInfo {
 				"Ringtones Directory",
 				Utils.getClassFieldStrOrNull("android.os.Environment", "DIRECTORY_RINGTONES"),
 				"Standard directory in which to place any audio files that should be in the list of ringtones that the user can select (not as regular music)."));
+
+		//[[ gtko130910, Directory usage
+
+		// Internal storage
+		StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
+		int bytesAvailable = stat.getAvailableBlocks()*stat.getBlockSize();
+		items.add(new Config(
+				"Internal Storage", String.valueOf(bytesAvailable/1048576),
+				"Available Internal Storage size") );
+	    
+	    bytesAvailable = stat.getFreeBlocks()*stat.getBlockSize();
+		items.add(new Config(
+				"Internal Storage(Free)", String.valueOf(bytesAvailable/1048576),
+				"Available Free Internal Storage size") );
+
+	    bytesAvailable = stat.getFreeBlocks()*stat.getBlockSize();
+		items.add(new Config(
+				"Internal Storage", String.valueOf(bytesAvailable/1048576),
+				"Available Free Internal Storage size") );
+
+	    bytesAvailable = stat.getBlockCount()*stat.getBlockSize();
+		items.add(new Config(
+				"Internal Storage(Total)", String.valueOf(bytesAvailable/1048576),
+				"Total Internal Storage size") );
+
+		// External Storage
+		stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+	    bytesAvailable = stat.getBlockCount()*stat.getBlockSize();
+		items.add(new Config(
+				"External Storage(Total)", String.valueOf(bytesAvailable/1048576),
+				"Total External Storage size") );
+
+	    bytesAvailable = stat.getAvailableBlocks()*stat.getBlockSize();
+		items.add(new Config(
+				"External Storage(Free)", String.valueOf(bytesAvailable/1048576),
+				"Available Free External Storage size") );
+
+	    bytesAvailable = stat.getAvailableBlocks()*stat.getBlockSize();
+		items.add(new Config(
+				"External Storage", String.valueOf(bytesAvailable/1048576),
+				"Available External Storage size") );
+		//]] gtko130910
+
 		return env;
 	}
 
@@ -446,4 +491,7 @@ public class SysInfo {
 		batteryReceiver = new BatteryReceiver();
 		getContext().registerReceiver(batteryReceiver, batteryChargedFilter);
 	}
+	
+	
+	
 }
